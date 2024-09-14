@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -50,11 +51,11 @@ func TestMainHandlerWhenCountMoreThanTotal(t *testing.T) {
 	handler.ServeHTTP(responseRecorder, req)
 
 	status := responseRecorder.Code
-	assert.Equal(t, http.StatusOK, status, "expected status code to be")
-	body := responseRecorder.Body.String()
+	assert.Equal(t, http.StatusOK, status)
 
-	if len(body) != totalCount {
-		t.Errorf("body length should be equal to the number of cafes, but got %d", len(body))
-	}
+	body := responseRecorder.Body.String()
+	assert.NotEmpty(t, body)
+	bodyList := strings.Split(body, ",")
+	assert.Len(t, bodyList, totalCount)
 
 }

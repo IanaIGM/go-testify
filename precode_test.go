@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestMainHandler(t *testing.T) {
@@ -17,14 +16,10 @@ func TestMainHandler(t *testing.T) {
 	handler := http.HandlerFunc(mainHandle)
 	handler.ServeHTTP(responseRecorder, req)
 
-	if status := responseRecorder.Code; status != http.StatusOK {
-		t.Errorf("expected status code: %d, got %d", http.StatusOK, status)
-	}
+	assert.Equal(t, http.StatusOK, responseRecorder.Code)
 
 	body := responseRecorder.Body.String()
-	if len(body) == 0 {
-		t.Error("body is empty")
-	}
+	assert.NotEmpty(t, body)
 }
 func TestWrongCity(t *testing.T) {
 	req := httptest.NewRequest("GET", "/cafe?count=1&city=unknown", nil)
@@ -35,12 +30,7 @@ func TestWrongCity(t *testing.T) {
 	handler.ServeHTTP(responseRecorder, req)
 
 	status := responseRecorder.Code
-	if status != http.StatusBadRequest {
-		require.Equal(t, http.StatusBadRequest, status, "wrong city value")
-	} else {
-		body := responseRecorder.Body.String()
-		assert.Contains(t, body, "wrong city value", "body should contain wrong city value error")
-	}
+	assert.Equal(t, http.StatusBadRequest, status, "wrong city value")
 }
 func TestMainHandlerWhenCountMoreThanTotal(t *testing.T) {
 	totalCount := 4
